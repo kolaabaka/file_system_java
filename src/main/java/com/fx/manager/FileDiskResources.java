@@ -19,12 +19,34 @@ public class FileDiskResources {
 
     private final Map<MemoryRecord, List<Integer>> memoryRecordListMap = new HashMap();
 
+    public int getFreeSize(){
+        return freeIndex.size();
+    }
+
     public synchronized boolean initStorage(int storageSize) {
         if (!initialized) {
             diskStorage = new MemoryCell[storageSize];
             this.freeIndex = new ArrayList<>(IntStream.range(0, storageSize).boxed().toList());
             initialized = true;
         }
+        return true;
+    }
+
+    public boolean deleteRecord(String name) {
+        List<Integer> indexes = new ArrayList<>();
+        for (var entity : memoryRecordListMap.keySet()) {
+            if (entity.getName().equals(name)) {
+                indexes = memoryRecordListMap.get(entity);
+                memoryRecordListMap.remove(entity);
+                break;
+            }
+        }
+        if (indexes.isEmpty()) {
+            throw new RuntimeException("Resources not found for name");
+        }
+
+        freeIndex.addAll(indexes);
+
         return true;
     }
 
