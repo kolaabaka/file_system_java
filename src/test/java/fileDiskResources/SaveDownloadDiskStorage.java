@@ -23,13 +23,13 @@ public class SaveDownloadDiskStorage {
         File file = new File();
         file.setName("FILE_NAME");
         file.setAccess(0L);
-        file.setPayload("CONSTANT_STRING");
+        file.setPayload(CONSTANT_STRING);
 
         fileDiskResources.saveRecord(file);
 
         byte[] result = fileDiskResources.getResourcesByName("FILE_NAME");
         var savedString = new String(result);
 
-        Assertions.assertEquals(savedString, "CONSTANT_STRING");
+        Assertions.assertEquals(savedString, CONSTANT_STRING);
     }
 }
