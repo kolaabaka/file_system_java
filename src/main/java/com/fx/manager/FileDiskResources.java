@@ -22,7 +22,7 @@ public class FileDiskResources {
     public synchronized boolean initStorage(int storageSize) {
         if (!initialized) {
             diskStorage = new MemoryCell[storageSize];
-            freeIndex = IntStream.range(0, storageSize).boxed().toList();
+            this.freeIndex = new ArrayList<>(IntStream.range(0, storageSize).boxed().toList());
             initialized = true;
         }
         return true;
@@ -45,6 +45,37 @@ public class FileDiskResources {
         this.memoryRecordListMap.put(record, indexes);
 
         return true;
+    }
+
+    public byte[] getResourcesByName(String name) {
+        List<Integer> indexes = new ArrayList<>();
+
+        for (var entity : memoryRecordListMap.keySet()) {
+            if (entity.getName().equals(name)) {
+                indexes = memoryRecordListMap.get(entity);
+                break;
+            }
+        }
+
+        if (indexes.isEmpty()) {
+            throw new RuntimeException("Resources not found for name");
+        }
+
+        List<Byte> resultPayload = new ArrayList<>();
+
+        for (var i : indexes) {
+            byte[] storeInfo = diskStorage[i].getStoreInfo();
+            for (int j = 0; j < storeInfo.length; j++) {
+                resultPayload.add(storeInfo[j]);
+            }
+        }
+
+        byte[] array = new byte[resultPayload.size()];
+        for (int i = 0; i < resultPayload.size(); i++) {
+            array[i] = resultPayload.get(i);
+        }
+
+        return array;
     }
 
     public synchronized List<Integer> saveResources(byte[] payload) {
